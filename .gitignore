@@ -2,3 +2,4 @@ node_modules/
 dist/
 debug-screenshot.png
 .playwright-mcp/
+.claude/

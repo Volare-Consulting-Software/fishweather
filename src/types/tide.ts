@@ -1,3 +1,5 @@
+import { TideType } from "./tideType";
+
 export interface TideStation {
   id: string;
   name: string;
@@ -8,7 +10,7 @@ export interface TideStation {
 export interface TidePrediction {
   time: string;
   height: number;
-  type: string;
+  type: TideType;
 }
 
 export interface TideResult {
