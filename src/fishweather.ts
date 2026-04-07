@@ -1,21 +1,25 @@
-const { chromium } = require("playwright");
+import { chromium, Browser, Page } from "playwright";
+import { Station, ScrapedData, ForecastRow } from "./types";
 
 const BASE_URL = "https://fishweather.com";
 
-function degreesToCompass(deg) {
-  const directions = [
-    "N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE",
-    "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW",
-  ];
+const COMPASS_DIRECTIONS = [
+  "N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE",
+  "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW",
+] as const;
+
+function degreesToCompass(deg: number): string {
   const index = Math.round(deg / 22.5) % 16;
-  return directions[index];
+  return COMPASS_DIRECTIONS[index]!;
 }
 
-function reverseDegrees(deg) {
+function reverseDegrees(deg: number): number {
   return (deg + 180) % 360;
 }
 
-async function createBrowser(headless = true) {
+export async function createBrowser(
+  headless: boolean = true
+): Promise<{ browser: Browser; page: Page }> {
   const browser = await chromium.launch({
     headless,
     args: [
@@ -39,7 +43,10 @@ async function createBrowser(headless = true) {
   return { browser, page };
 }
 
-async function searchStation(page, location) {
+export async function searchStation(
+  page: Page,
+  location: string
+): Promise<Station> {
   const searchUrl = `${BASE_URL}/windlist/${encodeURIComponent(location)}`;
   await page.goto(searchUrl, { waitUntil: "load", timeout: 60000 });
   await page.waitForTimeout(5000);
@@ -47,7 +54,7 @@ async function searchStation(page, location) {
   const station = await page.evaluate(() => {
     const items = document.querySelectorAll(".jw-spot-list > li");
     for (const li of items) {
-      const text = li.textContent.replace(/\s+/g, " ").trim();
+      const text = li.textContent?.replace(/\s+/g, " ").trim() ?? "";
       const isPremium =
         text.includes("Pro/Gold") ||
         text.includes("Plus/Pro") ||
@@ -58,7 +65,7 @@ async function searchStation(page, location) {
       const mainEl = li.querySelector('[id$="-main"]');
       const id = mainEl?.id?.replace("-main", "") || "";
       const name =
-        li.querySelector(".jw-station-name")?.textContent.trim() || "";
+        li.querySelector(".jw-station-name")?.textContent?.trim() || "";
       if (id && name) return { id, name };
     }
     return null;
@@ -73,7 +80,10 @@ async function searchStation(page, location) {
   return station;
 }
 
-async function scrapeForecast(page, spotId) {
+export async function scrapeForecast(
+  page: Page,
+  spotId: string
+): Promise<ForecastRow[]> {
   const spotUrl = `${BASE_URL}/spot/${spotId}`;
   await page.goto(spotUrl, { waitUntil: "load", timeout: 60000 });
 
@@ -93,22 +103,22 @@ async function scrapeForecast(page, spotId) {
 
   await page.evaluate(() => {
     const btn = Array.from(document.querySelectorAll("button")).find(
-      (b) => b.textContent.trim() === "7 Day"
+      (b) => b.textContent?.trim() === "7 Day"
     );
     if (btn) btn.click();
   });
   await page.waitForTimeout(2000);
 
-  const data = await page.evaluate(() => {
+  const data: ScrapedData = await page.evaluate(() => {
     const dayCells = document.querySelectorAll(
       '[class*="jw-fxt-table-cell-day"][class*="headday"]'
     );
-    const days = Array.from(dayCells).map((c) => c.textContent.trim());
+    const days = Array.from(dayCells).map((c) => c.textContent?.trim() ?? "");
 
     const hourCells = document.querySelectorAll(
       '[class*="jw-fxt-table-cell-hour"][class*="datacell"]'
     );
-    const hours = Array.from(hourCells).map((c) => c.textContent.trim());
+    const hours = Array.from(hourCells).map((c) => c.textContent?.trim() ?? "");
 
     const windCells = document.querySelectorAll(
       '[class*="jw-fxt-table-cell-wind"][class*="datacell"]'
@@ -116,11 +126,11 @@ async function scrapeForecast(page, spotId) {
     const winds = Array.from(windCells).map((c) => {
       const divs = c.querySelectorAll("div");
       const texts = Array.from(divs)
-        .map((d) => d.textContent.trim())
+        .map((d) => d.textContent?.trim() ?? "")
         .filter((t) => t);
       return {
-        speed: parseInt(texts[0]) || 0,
-        directionDeg: parseInt(texts[1]) || 0,
+        speed: parseInt(texts[0] ?? "0") || 0,
+        directionDeg: parseInt(texts[1] ?? "0") || 0,
       };
     });
 
@@ -128,28 +138,28 @@ async function scrapeForecast(page, spotId) {
       '[class*="jw-fxt-table-cell-wave"][class*="datacell"]'
     );
     const waves = Array.from(waveCells).map((c) =>
-      parseFloat(c.textContent.trim()) || 0
+      parseFloat(c.textContent?.trim() ?? "0") || 0
     );
 
     const gustCells = document.querySelectorAll(
       '[class*="jw-fxt-table-cell-gust"][class*="datacell"]'
     );
     const gusts = Array.from(gustCells).map((c) =>
-      parseInt(c.textContent.trim()) || 0
+      parseInt(c.textContent?.trim() ?? "0") || 0
     );
 
     const tempCells = document.querySelectorAll(
       '[class*="jw-fxt-table-cell-atemp"][class*="datacell"]'
     );
     const temps = Array.from(tempCells).map((c) =>
-      parseInt(c.textContent.trim()) || 0
+      parseInt(c.textContent?.trim() ?? "0") || 0
     );
 
     const cloudCells = document.querySelectorAll(
       '[class*="jw-fxt-table-cell-cloud"][class*="datacell"]'
     );
     const clouds = Array.from(cloudCells).map((c) =>
-      parseInt(c.textContent.trim()) || 0
+      parseInt(c.textContent?.trim() ?? "0") || 0
     );
 
     const precipCells = document.querySelectorAll(
@@ -158,35 +168,35 @@ async function scrapeForecast(page, spotId) {
     const precip = Array.from(precipCells).map((c) => {
       const cls = c.className || "";
       const match = cls.match(/weather-precip_(\d+)/);
-      return match ? parseInt(match[1]) : 0;
+      return match?.[1] ? parseInt(match[1]) : 0;
     });
 
     return { days, hours, winds, waves, gusts, temps, clouds, precip };
   });
 
   // Map day abbreviations to actual dates starting from today
-  const dayAbbrs = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const dayAbbrs = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
   const today = new Date();
   today.setHours(12, 0, 0, 0);
-  const dayDates = {};
+  const dayDates: Record<string, string> = {};
   for (let offset = 0; offset < 14; offset++) {
     const d = new Date(today);
     d.setDate(d.getDate() + offset);
     const abbr = dayAbbrs[d.getDay()];
-    if (!dayDates[abbr]) dayDates[abbr] = d.toISOString().split("T")[0];
+    if (abbr && !dayDates[abbr]) dayDates[abbr] = d.toISOString().split("T")[0]!;
   }
 
-  const forecast = [];
+  const forecast: ForecastRow[] = [];
   for (let i = 0; i < data.hours.length; i++) {
     const dayIndex = Math.floor(i / 2);
     const rawDeg = data.winds[i]?.directionDeg ?? 0;
     const reversedDeg = reverseDegrees(rawDeg);
-    const dayName = data.days[dayIndex] || "";
+    const dayName = data.days[dayIndex] ?? "";
 
     forecast.push({
       day: dayName,
-      date: dayDates[dayName] || "",
-      period: data.hours[i],
+      date: dayDates[dayName] ?? "",
+      period: data.hours[i] ?? "",
       windSpeed: data.winds[i]?.speed ?? 0,
       windDirDeg: reversedDeg,
       windDirCompass: degreesToCompass(reversedDeg),
@@ -195,10 +205,11 @@ async function scrapeForecast(page, spotId) {
       tempF: data.temps[i] ?? 0,
       cloudPct: data.clouds[i] ?? 0,
       precipPct: data.precip[i] ?? 0,
+      moonPhase: "",
+      moonIllumination: 0,
+      tides: [],
     });
   }
 
   return forecast;
 }
-
-module.exports = { createBrowser, searchStation, scrapeForecast };

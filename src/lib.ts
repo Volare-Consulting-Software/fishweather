@@ -1,11 +1,16 @@
-const { createBrowser, searchStation, scrapeForecast } = require("./fishweather");
-const { getMoonPhaseForDays } = require("./moon");
-const { getTides } = require("./noaa");
+import { createBrowser, searchStation, scrapeForecast } from "./fishweather";
+import { getMoonPhaseForDays } from "./moon";
+import { getTides } from "./noaa";
+import { ForecastResult } from "./types";
 
-async function getForecast(location, headless = true) {
+export async function getForecast(
+  location: string,
+  headless: boolean = true
+): Promise<ForecastResult> {
   const { browser, page } = await createBrowser(headless);
 
-  let weatherStation, forecast;
+  let weatherStation;
+  let forecast;
   try {
     weatherStation = await searchStation(page, location);
     forecast = await scrapeForecast(page, weatherStation.id);
@@ -23,17 +28,19 @@ async function getForecast(location, headless = true) {
   try {
     tideData = await getTides(location);
   } catch (err) {
-    console.error(`Warning: Could not fetch tide data: ${err.message}`);
+    const message = err instanceof Error ? err.message : String(err);
+    console.error(`Warning: Could not fetch tide data: ${message}`);
   }
 
   // Enrich each forecast row with moon and tide data
   for (const row of forecast) {
-    const moon = moonPhases[row.date] || { phase: "", illumination: 0 };
+    const moon = moonPhases[row.date] ?? { phase: "", illumination: 0 };
     row.moonPhase = moon.phase;
     row.moonIllumination = moon.illumination;
 
-    if (tideData?.byDate[row.date]) {
-      row.tides = tideData.byDate[row.date];
+    const dateTides = tideData?.byDate[row.date];
+    if (dateTides) {
+      row.tides = dateTides;
     } else {
       row.tides = [];
     }
@@ -42,9 +49,7 @@ async function getForecast(location, headless = true) {
   return {
     station: weatherStation.name,
     spotId: weatherStation.id,
-    tideStation: tideData?.station || null,
+    tideStation: tideData?.station ?? null,
     forecast,
   };
 }
-
-module.exports = { getForecast };

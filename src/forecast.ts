@@ -1,21 +1,24 @@
 #!/usr/bin/env node
-const { getForecast } = require("./lib");
-const { getTides } = require("./noaa");
+import { getForecast } from "./lib";
+import { getTides } from "./noaa";
+import { ForecastResult, TidePrediction, TideResult } from "./types";
 
-function formatTides(tides) {
-  if (!tides || tides.length === 0) return "";
+function formatTides(tides: TidePrediction[]): string {
+  if (tides.length === 0) return "";
   return tides
     .map((t) => {
-      const time = t.time.split(" ")[1] || "";
+      const time = t.time.split(" ")[1] ?? "";
       return `${t.type[0]}${t.height.toFixed(1)}ft@${time}`;
     })
     .join(" ");
 }
 
-function printTable(result) {
+function printTable(result: ForecastResult): void {
   console.log(`\n${result.station} - 7 Day Forecast`);
   if (result.tideStation) {
-    console.log(`Tides: ${result.tideStation.name} (NOAA ${result.tideStation.id})`);
+    console.log(
+      `Tides: ${result.tideStation.name} (NOAA ${result.tideStation.id})`
+    );
   }
   console.log(`Fetched: ${new Date().toLocaleString()}\n`);
 
@@ -38,31 +41,35 @@ function printTable(result) {
   }
 }
 
-function printTides(result) {
-  console.log(`\nTide Predictions — ${result.station.name} (NOAA ${result.station.id})`);
+function printTides(result: TideResult): void {
+  console.log(
+    `\nTide Predictions — ${result.station.name} (NOAA ${result.station.id})`
+  );
   console.log(`Fetched: ${new Date().toLocaleString()}\n`);
 
   for (const [date, tides] of Object.entries(result.byDate)) {
     console.log(date);
     for (const t of tides) {
-      const time = t.time.split(" ")[1] || "";
-      console.log(`  ${t.type.padEnd(4)} ${t.height.toFixed(1)} ft  @ ${time}`);
+      const time = t.time.split(" ")[1] ?? "";
+      console.log(
+        `  ${t.type.padEnd(4)} ${t.height.toFixed(1)} ft  @ ${time}`
+      );
     }
   }
 }
 
-function printUsage() {
-  console.log("Usage: node forecast.js <location> [options]");
+function printUsage(): void {
+  console.log("Usage: fishweather <location> [options]");
   console.log("");
   console.log("  Searches FishWeather for the given location and pulls the");
   console.log("  7-day wind/wave forecast from the first free station found.");
   console.log("  Includes NOAA tide predictions and moon phase data.");
   console.log("");
   console.log("Examples:");
-  console.log('  node forecast.js "southport, nc"');
-  console.log('  node forecast.js "key west, fl" --json');
-  console.log('  node forecast.js "outer banks" --visible');
-  console.log('  node forecast.js "southport, nc" --tides');
+  console.log('  fishweather "southport, nc"');
+  console.log('  fishweather "key west, fl" --json');
+  console.log('  fishweather "outer banks" --visible');
+  console.log('  fishweather "southport, nc" --tides');
   console.log("");
   console.log("Options:");
   console.log("  --json       Output as JSON instead of a table");
@@ -71,9 +78,9 @@ function printUsage() {
   console.log("  --mcp        Start as an MCP server (for Claude Code)");
 }
 
-async function main() {
+async function main(): Promise<void> {
   if (process.argv.includes("--mcp")) {
-    require("./mcp-server");
+    await import("./mcp-server");
     return;
   }
 
@@ -109,7 +116,8 @@ async function main() {
       }
     }
   } catch (err) {
-    console.error("Error:", err.message);
+    const message = err instanceof Error ? err.message : String(err);
+    console.error("Error:", message);
     process.exit(1);
   }
 }

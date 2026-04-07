@@ -47,29 +47,35 @@ npm install
 npx playwright install chromium
 ```
 
+### Build
+
+```bash
+npm run build
+```
+
 ## Usage
 
 ```bash
-node src/forecast.js <location> [options]
+npm run forecast -- <location> [options]
 ```
 
 ### Examples
 
 ```bash
 # Full fishing forecast (weather + tides + moon)
-node src/forecast.js "southport, nc"
+npm run forecast -- "southport, nc"
 
 # Tides only (no weather scraping — fast)
-node src/forecast.js "southport, nc" --tides
+npm run forecast -- "southport, nc" --tides
 
 # JSON output (useful for piping to other tools)
-node src/forecast.js "key west, fl" --json
+npm run forecast -- "key west, fl" --json
 
 # Tides as JSON
-node src/forecast.js "key west, fl" --tides --json
+npm run forecast -- "key west, fl" --tides --json
 
 # Show the browser window while scraping (for debugging)
-node src/forecast.js "outer banks" --visible
+npm run forecast -- "outer banks" --visible
 ```
 
 ### Options
@@ -153,12 +159,13 @@ Moon phase is included because it affects fish behavior. Around a **Full Moon**,
 
 ```
 src/
-  fishweather.js  — FishWeather scraping (Playwright browser, station search, forecast)
-  noaa.js         — NOAA tides (geocode location, find nearest station, fetch predictions)
-  moon.js         — Moon phase calculator (pure math, no dependencies)
-  lib.js          — Orchestrator (combines weather + tides + moon into one result)
-  forecast.js     — CLI entry point (also serves as MCP entry via --mcp flag)
-  mcp-server.js   — MCP server definition
+  types/            — TypeScript type definitions (one file per type)
+  fishweather.ts    — FishWeather scraping (Playwright browser, station search, forecast)
+  noaa.ts           — NOAA tides (geocode location, find nearest station, fetch predictions)
+  moon.ts           — Moon phase calculator (pure math, no dependencies)
+  lib.ts            — Orchestrator (combines weather + tides + moon into one result)
+  forecast.ts       — CLI entry point (also serves as MCP entry via --mcp flag)
+  mcp-server.ts     — MCP server definition
 ```
 
 ## MCP Server (Claude Code Integration)

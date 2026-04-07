@@ -1,21 +1,20 @@
-const { McpServer } = require("@modelcontextprotocol/sdk/server/mcp.js");
-const {
-  StdioServerTransport,
-} = require("@modelcontextprotocol/sdk/server/stdio.js");
-const { z } = require("zod");
-const { getForecast } = require("./lib");
-const { getTides } = require("./noaa");
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { z } from "zod";
+import { getForecast } from "./lib";
+import { getTides } from "./noaa";
+import { TidePrediction } from "./types";
 
 const server = new McpServer({
   name: "fishweather",
   version: "1.0.0",
 });
 
-function formatTides(tides) {
-  if (!tides || tides.length === 0) return "";
+function formatTides(tides: TidePrediction[]): string {
+  if (tides.length === 0) return "";
   return tides
     .map((t) => {
-      const time = t.time.split(" ")[1] || "";
+      const time = t.time.split(" ")[1] ?? "";
       return `${t.type[0]}${t.height.toFixed(1)}ft@${time}`;
     })
     .join(" ");
@@ -62,17 +61,18 @@ server.tool(
 
       return {
         content: [
-          { type: "text", text },
+          { type: "text" as const, text },
           {
-            type: "text",
+            type: "text" as const,
             text: JSON.stringify(result, null, 2),
-            annotations: { audience: ["assistant"] },
+            annotations: { audience: ["assistant" as const] },
           },
         ],
       };
     } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
       return {
-        content: [{ type: "text", text: `Error: ${err.message}` }],
+        content: [{ type: "text" as const, text: `Error: ${message}` }],
         isError: true,
       };
     }
@@ -106,31 +106,32 @@ server.tool(
       for (const [date, tides] of Object.entries(result.byDate)) {
         text += `${date}\n`;
         for (const t of tides) {
-          const time = t.time.split(" ")[1] || "";
+          const time = t.time.split(" ")[1] ?? "";
           text += `  ${t.type.padEnd(4)} ${t.height.toFixed(1)} ft  @ ${time}\n`;
         }
       }
 
       return {
         content: [
-          { type: "text", text },
+          { type: "text" as const, text },
           {
-            type: "text",
+            type: "text" as const,
             text: JSON.stringify(result, null, 2),
-            annotations: { audience: ["assistant"] },
+            annotations: { audience: ["assistant" as const] },
           },
         ],
       };
     } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
       return {
-        content: [{ type: "text", text: `Error: ${err.message}` }],
+        content: [{ type: "text" as const, text: `Error: ${message}` }],
         isError: true,
       };
     }
   }
 );
 
-async function main() {
+async function main(): Promise<void> {
   const transport = new StdioServerTransport();
   await server.connect(transport);
 }
