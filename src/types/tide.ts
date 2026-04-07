@@ -1,4 +1,4 @@
-import { TideType } from "./tide-type";
+import { TideType } from "./tideType";
 
 export interface TideStation {
   id: string;

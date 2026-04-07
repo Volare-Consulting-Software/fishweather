@@ -7,7 +7,7 @@ import { TOKENS, ITideProvider } from "./interfaces";
 import {
   formatForecastTable,
   formatTideReport,
-} from "./formatters/forecast-formatter";
+} from "./formatters/forecastFormatter";
 
 function printUsage(): void {
   console.log("Usage: fishweather <location> [options]");
@@ -31,7 +31,7 @@ function printUsage(): void {
 
 async function main(): Promise<void> {
   if (process.argv.includes("--mcp")) {
-    await import("./mcp-server");
+    await import("./mcpServer");
     return;
   }
 

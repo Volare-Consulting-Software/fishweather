@@ -3,11 +3,11 @@ import {
   formatTides,
   formatForecastTable,
   formatTideReport,
-} from "../src/formatters/forecast-formatter";
-import { ForecastResult } from "../src/types/forecast-result";
-import { MoonPhase } from "../src/types/moon-phase";
+} from "../src/formatters/forecastFormatter";
+import { ForecastResult } from "../src/types/forecastResult";
+import { MoonPhase } from "../src/types/moonPhase";
 import { TidePrediction, TideResult } from "../src/types/tide";
-import { TideType } from "../src/types/tide-type";
+import { TideType } from "../src/types/tideType";
 
 const TEST_DATE = "2024-01-01";
 const HIGH_TIDE_TIME = "2024-01-01 06:30";

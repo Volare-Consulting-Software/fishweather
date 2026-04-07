@@ -1,5 +1,5 @@
 import { TideStation } from "./tide";
-import { ForecastRow } from "./forecast-row";
+import { ForecastRow } from "./forecastRow";
 
 export interface ForecastResult {
   station: string;

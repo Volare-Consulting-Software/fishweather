@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { getMoonPhase, getMoonPhaseForDays } from "../src/moon";
-import { MoonPhase } from "../src/types/moon-phase";
+import { MoonPhase } from "../src/types/moonPhase";
 
 const KNOWN_NEW_MOON_DATE = "2000-01-06";
 const FULL_MOON_DATE = "2024-06-23";

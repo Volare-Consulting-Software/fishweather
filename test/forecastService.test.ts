@@ -7,11 +7,11 @@ import {
   ILogger,
 } from "../src/interfaces";
 import { ForecastService } from "../src/lib";
-import { ForecastRow } from "../src/types/forecast-row";
-import { MoonPhase } from "../src/types/moon-phase";
+import { ForecastRow } from "../src/types/forecastRow";
+import { MoonPhase } from "../src/types/moonPhase";
 import { TideResult } from "../src/types/tide";
-import { TideType } from "../src/types/tide-type";
-import { registerMocks, container } from "./test-container";
+import { TideType } from "../src/types/tideType";
+import { registerMocks, container } from "./testContainer";
 
 const TEST_DATE = "2024-01-01";
 const TEST_STATION_NAME = "Test Station";

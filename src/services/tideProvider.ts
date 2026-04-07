@@ -1,7 +1,7 @@
 import { inject, injectable } from "tsyringe";
 import { TOKENS, IHttpClient, IGeocoder } from "../interfaces";
 import { ForecastServiceConfig } from "../config";
-import { TideType } from "../types/tide-type";
+import { TideType } from "../types/tideType";
 import { TideStation, TidePrediction, TideResult } from "../types/tide";
 import { NoaaStation, NoaaStationsResponse, NoaaPredictionsResponse } from "../types/noaa";
 

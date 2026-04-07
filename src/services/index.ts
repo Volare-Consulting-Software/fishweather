@@ -1,6 +1,6 @@
-export { HttpClient } from "./http-client";
+export { HttpClient } from "./httpClient";
 export { ArcGisGeocoder } from "./geocoder";
-export { NoaaTideProvider } from "./tide-provider";
-export { MoonPhaseProvider } from "./moon-phase-provider";
-export { FishweatherScraper } from "./weather-scraper";
+export { NoaaTideProvider } from "./tideProvider";
+export { MoonPhaseProvider } from "./moonPhaseProvider";
+export { FishweatherScraper } from "./weatherScraper";
 export { ConsoleLogger } from "./logger";

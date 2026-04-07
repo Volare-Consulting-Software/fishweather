@@ -9,7 +9,7 @@ import { TOKENS, ITideProvider } from "./interfaces";
 import {
   formatForecastTable,
   formatTideReport,
-} from "./formatters/forecast-formatter";
+} from "./formatters/forecastFormatter";
 
 const server = new McpServer({
   name: "fishweather",

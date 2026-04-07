@@ -14,7 +14,7 @@
   "scripts": {
     "build": "tsc",
     "forecast": "tsx src/forecast.ts",
-    "mcp": "tsx src/mcp-server.ts",
+    "mcp": "tsx src/mcpServer.ts",
     "install-browser": "npx playwright install chromium",
     "test": "vitest run",
     "test:watch": "vitest"

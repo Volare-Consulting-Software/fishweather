@@ -1,10 +1,10 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { Mock, It, Times } from "moq.ts";
 import { IHttpClient, IGeocoder } from "../src/interfaces";
-import { NoaaTideProvider } from "../src/services/tide-provider";
-import { TideType } from "../src/types/tide-type";
+import { NoaaTideProvider } from "../src/services/tideProvider";
+import { TideType } from "../src/types/tideType";
 import { NoaaStationsResponse, NoaaPredictionsResponse } from "../src/types/noaa";
-import { registerMocks, container } from "./test-container";
+import { registerMocks, container } from "./testContainer";
 
 const SPRINGMAID_ID = "8661070";
 const WILMINGTON_ID = "8658120";

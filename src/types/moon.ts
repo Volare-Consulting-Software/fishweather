@@ -1,4 +1,4 @@
-import { MoonPhase } from "./moon-phase";
+import { MoonPhase } from "./moonPhase";
 
 export interface MoonPhaseInfo {
   phase: MoonPhase;

@@ -1,4 +1,4 @@
-import { MoonPhase } from "./types/moon-phase";
+import { MoonPhase } from "./types/moonPhase";
 import { MoonPhaseInfo, MoonPhaseMap } from "./types/moon";
 
 // Moon phase calculator — pure math, no API needed.

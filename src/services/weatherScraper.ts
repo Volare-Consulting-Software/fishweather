@@ -3,8 +3,8 @@ import { chromium, Browser, Page } from "playwright";
 import { TOKENS, ILogger } from "../interfaces";
 import { ForecastServiceConfig } from "../config";
 import { Station } from "../types/station";
-import { ScrapedData } from "../types/scraped-data";
-import { ForecastRow } from "../types/forecast-row";
+import { ScrapedData } from "../types/scrapedData";
+import { ForecastRow } from "../types/forecastRow";
 
 const COMPASS_DIRECTIONS = [
   "N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE",

@@ -1,5 +1,5 @@
 import { TidePrediction } from "./tide";
-import { MoonPhase } from "./moon-phase";
+import { MoonPhase } from "./moonPhase";
 
 export interface ForecastRow {
   day: string;

@@ -6,7 +6,7 @@ import {
   IMoonPhaseProvider,
   ILogger,
 } from "./interfaces";
-import { ForecastResult } from "./types/forecast-result";
+import { ForecastResult } from "./types/forecastResult";
 
 @injectable()
 export class ForecastService {

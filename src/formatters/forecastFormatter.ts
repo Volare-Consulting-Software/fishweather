@@ -1,4 +1,4 @@
-import { ForecastResult } from "../types/forecast-result";
+import { ForecastResult } from "../types/forecastResult";
 import { TidePrediction, TideResult } from "../types/tide";
 
 export function formatTides(tides: TidePrediction[]): string {

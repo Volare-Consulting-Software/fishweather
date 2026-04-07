@@ -1,5 +1,5 @@
 import { Station } from "../types/station";
-import { ForecastRow } from "../types/forecast-row";
+import { ForecastRow } from "../types/forecastRow";
 
 export interface IWeatherScraper {
   getForecast(

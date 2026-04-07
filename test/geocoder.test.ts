@@ -3,7 +3,7 @@ import { Mock, It } from "moq.ts";
 import { IHttpClient } from "../src/interfaces";
 import { ArcGisGeocoder } from "../src/services/geocoder";
 import { GeocodeResponse } from "../src/types/noaa";
-import { registerMocks, container } from "./test-container";
+import { registerMocks, container } from "./testContainer";
 
 const SOUTHPORT_LAT = 33.92;
 const SOUTHPORT_LNG = -78.02;
