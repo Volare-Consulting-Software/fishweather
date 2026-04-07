@@ -7,8 +7,8 @@ import { GeocodeResponse } from "../types/noaa";
 @injectable()
 export class ArcGisGeocoder {
   constructor(
-    @inject(TOKENS.HttpClient) private httpClient: IHttpClient,
-    @inject(TOKENS.Config) private config: ForecastServiceConfig
+    @inject(TOKENS.IHttpClient) private readonly httpClient: IHttpClient,
+    @inject(TOKENS.ForecastServiceConfig) private readonly config: ForecastServiceConfig
   ) {}
 
   async geocode(location: string): Promise<GeoLocation> {

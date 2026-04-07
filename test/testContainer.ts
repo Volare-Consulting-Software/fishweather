@@ -21,8 +21,8 @@ export function registerMocks(mocks: MockRegistrations): void {
     container.register(token, { useValue: (mock as Mock<unknown>).object() });
   }
 
-  if (!mocks.Config) {
-    container.register(TOKENS.Config, { useValue: DEFAULT_CONFIG });
+  if (!mocks.ForecastServiceConfig) {
+    container.register(TOKENS.ForecastServiceConfig, { useValue: DEFAULT_CONFIG });
   }
 }
 

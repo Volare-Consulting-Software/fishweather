@@ -14,8 +14,8 @@ const COMPASS_DIRECTIONS = [
 @injectable()
 export class FishweatherScraper {
   constructor(
-    @inject(TOKENS.Config) private config: ForecastServiceConfig,
-    @inject(TOKENS.Logger) private logger: ILogger
+    @inject(TOKENS.ForecastServiceConfig) private readonly config: ForecastServiceConfig,
+    @inject(TOKENS.ILogger) private readonly logger: ILogger
   ) {}
 
   async getForecast(

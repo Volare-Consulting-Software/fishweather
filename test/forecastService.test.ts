@@ -6,7 +6,7 @@ import {
   IMoonPhaseProvider,
   ILogger,
 } from "../src/interfaces";
-import { ForecastService } from "../src/lib";
+import { ForecastService } from "../src/services/forecastService";
 import { ForecastRow } from "../src/types/forecastRow";
 import { MoonPhase } from "../src/types/moonPhase";
 import { TideResult } from "../src/types/tide";
@@ -102,13 +102,13 @@ describe("ForecastService", () => {
   }
 
   function registerAllMocks(overrides?: {
-    TideProvider?: Mock<ITideProvider>;
+    ITideProvider?: Mock<ITideProvider>;
   }) {
     registerMocks({
-      WeatherScraper: weatherScraperMock,
-      TideProvider: overrides?.TideProvider ?? tideProviderMock,
-      MoonPhaseProvider: moonProviderMock,
-      Logger: loggerMock,
+      IWeatherScraper: weatherScraperMock,
+      ITideProvider: overrides?.ITideProvider ?? tideProviderMock,
+      IMoonPhaseProvider: moonProviderMock,
+      ILogger: loggerMock,
     });
     service = container.resolve(ForecastService);
   }
@@ -149,7 +149,7 @@ describe("ForecastService", () => {
       .setup((instance) => instance.getTides(It.IsAny()))
       .callback(() => Promise.reject(new Error("NOAA is down")));
 
-    registerAllMocks({ TideProvider: failingTideMock });
+    registerAllMocks({ ITideProvider: failingTideMock });
 
     const result = await service.getForecast("southport, nc");
     expect(result.forecast[0]!.tides).toEqual([]);
@@ -166,7 +166,7 @@ describe("ForecastService", () => {
       .setup((instance) => instance.getTides(It.IsAny()))
       .returnsAsync({ ...mockTideResult, byDate: {} });
 
-    registerAllMocks({ TideProvider: emptyTideMock });
+    registerAllMocks({ ITideProvider: emptyTideMock });
 
     const result = await service.getForecast("southport, nc");
     expect(result.forecast[0]!.tides).toEqual([]);

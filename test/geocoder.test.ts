@@ -16,7 +16,7 @@ describe("ArcGisGeocoder", () => {
 
   beforeEach(() => {
     httpClientMock = new Mock<IHttpClient>();
-    registerMocks({ HttpClient: httpClientMock });
+    registerMocks({ IHttpClient: httpClientMock });
     geocoder = container.resolve(ArcGisGeocoder);
   });
 

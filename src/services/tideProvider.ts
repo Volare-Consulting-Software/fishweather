@@ -10,9 +10,9 @@ export class NoaaTideProvider {
   private stationCache: NoaaStation[] | null = null;
 
   constructor(
-    @inject(TOKENS.HttpClient) private httpClient: IHttpClient,
-    @inject(TOKENS.Geocoder) private geocoder: IGeocoder,
-    @inject(TOKENS.Config) private config: ForecastServiceConfig
+    @inject(TOKENS.IHttpClient) private readonly httpClient: IHttpClient,
+    @inject(TOKENS.IGeocoder) private readonly geocoder: IGeocoder,
+    @inject(TOKENS.ForecastServiceConfig) private readonly config: ForecastServiceConfig
   ) {}
 
   async getTides(

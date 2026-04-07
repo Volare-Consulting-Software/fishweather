@@ -5,16 +5,16 @@ import {
   ITideProvider,
   IMoonPhaseProvider,
   ILogger,
-} from "./interfaces";
-import { ForecastResult } from "./types/forecastResult";
+} from "../interfaces";
+import { ForecastResult } from "../types/forecastResult";
 
 @injectable()
 export class ForecastService {
   constructor(
-    @inject(TOKENS.WeatherScraper) private weatherScraper: IWeatherScraper,
-    @inject(TOKENS.TideProvider) private tideProvider: ITideProvider,
-    @inject(TOKENS.MoonPhaseProvider) private moonProvider: IMoonPhaseProvider,
-    @inject(TOKENS.Logger) private logger: ILogger
+    @inject(TOKENS.IWeatherScraper) private readonly weatherScraper: IWeatherScraper,
+    @inject(TOKENS.ITideProvider) private readonly tideProvider: ITideProvider,
+    @inject(TOKENS.IMoonPhaseProvider) private readonly moonProvider: IMoonPhaseProvider,
+    @inject(TOKENS.ILogger) private readonly logger: ILogger
   ) {}
 
   async getForecast(

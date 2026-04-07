@@ -52,7 +52,7 @@ describe("NoaaTideProvider", () => {
         state: "NC",
       });
 
-    registerMocks({ HttpClient: httpClientMock, Geocoder: geocoderMock });
+    registerMocks({ IHttpClient: httpClientMock, IGeocoder: geocoderMock });
     tideProvider = container.resolve(NoaaTideProvider);
   });
 
@@ -106,7 +106,7 @@ describe("NoaaTideProvider", () => {
       .setup((instance) => instance.get(It.Is<string>((url) => url.includes("datagetter"))))
       .returnsAsync({ error: { message: errorMessage } });
 
-    registerMocks({ HttpClient: errorHttpMock, Geocoder: geocoderMock });
+    registerMocks({ IHttpClient: errorHttpMock, IGeocoder: geocoderMock });
     tideProvider = container.resolve(NoaaTideProvider);
 
     await expect(tideProvider.getTides("southport, nc")).rejects.toThrow(

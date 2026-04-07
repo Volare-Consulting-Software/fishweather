@@ -4,7 +4,7 @@ import { container } from "tsyringe";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
-import { ForecastService } from "./lib";
+import { ForecastService } from "./services/forecastService";
 import { TOKENS, ITideProvider } from "./interfaces";
 import {
   formatForecastTable,
@@ -74,7 +74,7 @@ server.tool(
   },
   async ({ location, days }) => {
     try {
-      const tideProvider = container.resolve<ITideProvider>(TOKENS.TideProvider);
+      const tideProvider = container.resolve<ITideProvider>(TOKENS.ITideProvider);
       const result = await tideProvider.getTides(location, days);
       const text = formatTideReport(result);
 

@@ -11,12 +11,12 @@ import {
   ConsoleLogger,
 } from "./services";
 
-container.register(TOKENS.Config, { useValue: DEFAULT_CONFIG });
-container.register(TOKENS.HttpClient, { useClass: HttpClient });
-container.register(TOKENS.Logger, { useClass: ConsoleLogger });
-container.register(TOKENS.Geocoder, { useClass: ArcGisGeocoder });
-container.register(TOKENS.TideProvider, { useClass: NoaaTideProvider });
-container.register(TOKENS.MoonPhaseProvider, { useClass: MoonPhaseProvider });
-container.register(TOKENS.WeatherScraper, { useClass: FishweatherScraper });
+container.register(TOKENS.ForecastServiceConfig, { useValue: DEFAULT_CONFIG });
+container.register(TOKENS.IHttpClient, { useClass: HttpClient });
+container.register(TOKENS.ILogger, { useClass: ConsoleLogger });
+container.register(TOKENS.IGeocoder, { useClass: ArcGisGeocoder });
+container.register(TOKENS.ITideProvider, { useClass: NoaaTideProvider });
+container.register(TOKENS.IMoonPhaseProvider, { useClass: MoonPhaseProvider });
+container.register(TOKENS.IWeatherScraper, { useClass: FishweatherScraper });
 
 export { container };
