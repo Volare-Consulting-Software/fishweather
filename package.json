@@ -27,6 +27,10 @@
     "claude",
     "model-context-protocol"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/volare-consulting-software/fishweather.git"
+  },
   "license": "MIT",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.1",
