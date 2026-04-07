@@ -1,0 +1,35 @@
+{
+  "name": "fishweather-forecast",
+  "version": "1.0.0",
+  "description": "7-day wind and wave forecast scraper from FishWeather. Available as a CLI, Node.js library, and MCP server for Claude Code.",
+  "main": "src/lib.js",
+  "bin": {
+    "fishweather": "src/forecast.js"
+  },
+  "files": [
+    "src/",
+    "README.md"
+  ],
+  "scripts": {
+    "forecast": "node src/forecast.js",
+    "mcp": "node src/mcp-server.js",
+    "install-browser": "npx playwright install chromium"
+  },
+  "keywords": [
+    "fishweather",
+    "weather",
+    "wind",
+    "wave",
+    "forecast",
+    "marine",
+    "fishing",
+    "mcp",
+    "claude",
+    "model-context-protocol"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "playwright": "^1.52.0"
+  }
+}

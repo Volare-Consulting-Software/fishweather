@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "fishweather": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["src/forecast.js", "--mcp"]
+    }
+  }
+}
