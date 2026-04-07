@@ -1,5 +1,7 @@
+import { MoonPhase } from "./moon-phase";
+
 export interface MoonPhaseInfo {
-  phase: string;
+  phase: MoonPhase;
   illumination: number;
   age: number;
 }

@@ -1,62 +1,13 @@
 #!/usr/bin/env node
-import { getForecast } from "./lib";
-import { getTides } from "./noaa";
-import { ForecastResult, TidePrediction, TideResult } from "./types";
-
-function formatTides(tides: TidePrediction[]): string {
-  if (tides.length === 0) return "";
-  return tides
-    .map((t) => {
-      const time = t.time.split(" ")[1] ?? "";
-      return `${t.type[0]}${t.height.toFixed(1)}ft@${time}`;
-    })
-    .join(" ");
-}
-
-function printTable(result: ForecastResult): void {
-  console.log(`\n${result.station} - 7 Day Forecast`);
-  if (result.tideStation) {
-    console.log(
-      `Tides: ${result.tideStation.name} (NOAA ${result.tideStation.id})`
-    );
-  }
-  console.log(`Fetched: ${new Date().toLocaleString()}\n`);
-
-  let prevDay = "";
-  for (const row of result.forecast) {
-    const isNewDay = row.day !== prevDay;
-    prevDay = row.day;
-
-    if (isNewDay) {
-      const moon = `${row.moonPhase} ${row.moonIllumination}%`;
-      const tideStr = formatTides(row.tides);
-      console.log(`--- ${row.day} ${row.date} | ${moon} ---`);
-      if (tideStr) console.log(`    Tides: ${tideStr}`);
-    }
-
-    const dir = `${row.windDirCompass} (${row.windDirDeg}°)`;
-    console.log(
-      `  ${row.period.padEnd(2)}  Wind ${String(row.windSpeed).padStart(2)} mph (g${String(row.gust).padStart(2)}) ${dir.padEnd(14)}  Waves ${String(row.waveHeight)}ft  ${String(row.tempF)}°F  Cloud ${String(row.cloudPct).padStart(3)}%  Rain ${String(row.precipPct)}%`
-    );
-  }
-}
-
-function printTides(result: TideResult): void {
-  console.log(
-    `\nTide Predictions — ${result.station.name} (NOAA ${result.station.id})`
-  );
-  console.log(`Fetched: ${new Date().toLocaleString()}\n`);
-
-  for (const [date, tides] of Object.entries(result.byDate)) {
-    console.log(date);
-    for (const t of tides) {
-      const time = t.time.split(" ")[1] ?? "";
-      console.log(
-        `  ${t.type.padEnd(4)} ${t.height.toFixed(1)} ft  @ ${time}`
-      );
-    }
-  }
-}
+import "reflect-metadata";
+import "./container";
+import { container } from "tsyringe";
+import { ForecastService } from "./lib";
+import { TOKENS, ITideProvider } from "./interfaces";
+import {
+  formatForecastTable,
+  formatTideReport,
+} from "./formatters/forecast-formatter";
 
 function printUsage(): void {
   console.log("Usage: fishweather <location> [options]");
@@ -99,20 +50,22 @@ async function main(): Promise<void> {
   try {
     if (tidesOnly) {
       console.log(`Fetching tides near "${location}"...`);
-      const result = await getTides(location);
+      const tideProvider = container.resolve<ITideProvider>(TOKENS.TideProvider);
+      const result = await tideProvider.getTides(location);
       if (outputJson) {
         console.log(JSON.stringify(result, null, 2));
       } else {
-        printTides(result);
+        console.log(formatTideReport(result));
       }
     } else {
       console.log(`Searching for stations near "${location}"...`);
-      const result = await getForecast(location, headless);
+      const service = container.resolve(ForecastService);
+      const result = await service.getForecast(location, headless);
       console.log(`Found station: ${result.station} (ID: ${result.spotId})`);
       if (outputJson) {
         console.log(JSON.stringify(result, null, 2));
       } else {
-        printTable(result);
+        console.log(formatForecastTable(result));
       }
     }
   } catch (err) {

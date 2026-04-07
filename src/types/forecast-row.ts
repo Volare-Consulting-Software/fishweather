@@ -1,4 +1,5 @@
-import { TidePrediction, TideStation } from "./tide";
+import { TidePrediction } from "./tide";
+import { MoonPhase } from "./moon-phase";
 
 export interface ForecastRow {
   day: string;
@@ -12,14 +13,7 @@ export interface ForecastRow {
   tempF: number;
   cloudPct: number;
   precipPct: number;
-  moonPhase: string;
+  moonPhase: MoonPhase | "";
   moonIllumination: number;
   tides: TidePrediction[];
-}
-
-export interface ForecastResult {
-  station: string;
-  spotId: string;
-  tideStation: TideStation | null;
-  forecast: ForecastRow[];
 }

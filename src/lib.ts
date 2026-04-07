@@ -1,55 +1,59 @@
-import { createBrowser, searchStation, scrapeForecast } from "./fishweather";
-import { getMoonPhaseForDays } from "./moon";
-import { getTides } from "./noaa";
-import { ForecastResult } from "./types";
+import { inject, injectable } from "tsyringe";
+import {
+  TOKENS,
+  IWeatherScraper,
+  ITideProvider,
+  IMoonPhaseProvider,
+  ILogger,
+} from "./interfaces";
+import { ForecastResult } from "./types/forecast-result";
 
-export async function getForecast(
-  location: string,
-  headless: boolean = true
-): Promise<ForecastResult> {
-  const { browser, page } = await createBrowser(headless);
+@injectable()
+export class ForecastService {
+  constructor(
+    @inject(TOKENS.WeatherScraper) private weatherScraper: IWeatherScraper,
+    @inject(TOKENS.TideProvider) private tideProvider: ITideProvider,
+    @inject(TOKENS.MoonPhaseProvider) private moonProvider: IMoonPhaseProvider,
+    @inject(TOKENS.Logger) private logger: ILogger
+  ) {}
 
-  let weatherStation;
-  let forecast;
-  try {
-    weatherStation = await searchStation(page, location);
-    forecast = await scrapeForecast(page, weatherStation.id);
-  } finally {
-    await browser.close();
-  }
+  async getForecast(
+    location: string,
+    headless: boolean = true
+  ): Promise<ForecastResult> {
+    const { station: weatherStation, forecast } =
+      await this.weatherScraper.getForecast(location, headless);
 
-  // Moon phases for the forecast date range
-  const today = new Date();
-  today.setHours(12, 0, 0, 0);
-  const moonPhases = getMoonPhaseForDays(today, 14);
+    const today = new Date();
+    today.setHours(12, 0, 0, 0);
+    const moonPhases = this.moonProvider.getPhasesForDays(today, 14);
 
-  // NOAA tides — run in parallel, don't fail the whole forecast if tides error
-  let tideData = null;
-  try {
-    tideData = await getTides(location);
-  } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
-    console.error(`Warning: Could not fetch tide data: ${message}`);
-  }
-
-  // Enrich each forecast row with moon and tide data
-  for (const row of forecast) {
-    const moon = moonPhases[row.date] ?? { phase: "", illumination: 0 };
-    row.moonPhase = moon.phase;
-    row.moonIllumination = moon.illumination;
-
-    const dateTides = tideData?.byDate[row.date];
-    if (dateTides) {
-      row.tides = dateTides;
-    } else {
-      row.tides = [];
+    let tideData = null;
+    try {
+      tideData = await this.tideProvider.getTides(location);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      this.logger.warn(`Warning: Could not fetch tide data: ${message}`);
     }
-  }
 
-  return {
-    station: weatherStation.name,
-    spotId: weatherStation.id,
-    tideStation: tideData?.station ?? null,
-    forecast,
-  };
+    for (const row of forecast) {
+      const moon = moonPhases[row.date] ?? { phase: "", illumination: 0 };
+      row.moonPhase = moon.phase;
+      row.moonIllumination = moon.illumination;
+
+      const dateTides = tideData?.byDate[row.date];
+      if (dateTides) {
+        row.tides = dateTides;
+      } else {
+        row.tides = [];
+      }
+    }
+
+    return {
+      station: weatherStation.name,
+      spotId: weatherStation.id,
+      tideStation: tideData?.station ?? null,
+      forecast,
+    };
+  }
 }

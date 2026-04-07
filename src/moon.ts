@@ -1,4 +1,5 @@
-import { MoonPhaseInfo, MoonPhaseMap } from "./types";
+import { MoonPhase } from "./types/moon-phase";
+import { MoonPhaseInfo, MoonPhaseMap } from "./types/moon";
 
 // Moon phase calculator — pure math, no API needed.
 // Uses a known new moon reference and the synodic month (29.53059 days).
@@ -17,16 +18,16 @@ export function getMoonPhase(date: Date | string): MoonPhaseInfo {
     ((1 - Math.cos((2 * Math.PI * age) / SYNODIC_MONTH)) / 2) * 100
   );
 
-  let phase: string;
-  if (age < 1.85) phase = "New Moon";
-  else if (age < 7.38) phase = "Waxing Crescent";
-  else if (age < 9.23) phase = "First Quarter";
-  else if (age < 14.77) phase = "Waxing Gibbous";
-  else if (age < 16.61) phase = "Full Moon";
-  else if (age < 22.15) phase = "Waning Gibbous";
-  else if (age < 23.99) phase = "Last Quarter";
-  else if (age < 27.68) phase = "Waning Crescent";
-  else phase = "New Moon";
+  let phase: MoonPhase;
+  if (age < 1.85) phase = MoonPhase.NewMoon;
+  else if (age < 7.38) phase = MoonPhase.WaxingCrescent;
+  else if (age < 9.23) phase = MoonPhase.FirstQuarter;
+  else if (age < 14.77) phase = MoonPhase.WaxingGibbous;
+  else if (age < 16.61) phase = MoonPhase.FullMoon;
+  else if (age < 22.15) phase = MoonPhase.WaningGibbous;
+  else if (age < 23.99) phase = MoonPhase.LastQuarter;
+  else if (age < 27.68) phase = MoonPhase.WaningCrescent;
+  else phase = MoonPhase.NewMoon;
 
   return { phase, illumination, age: Math.round(age * 10) / 10 };
 }

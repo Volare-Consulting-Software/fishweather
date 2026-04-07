@@ -8,6 +8,7 @@
     "outDir": "dist",
     "rootDir": "src",
     "strict": true,
+    "experimentalDecorators": true,
     "noUncheckedIndexedAccess": true,
     "esModuleInterop": true,
     "skipLibCheck": true,

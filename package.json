@@ -15,7 +15,9 @@
     "build": "tsc",
     "forecast": "tsx src/forecast.ts",
     "mcp": "tsx src/mcp-server.ts",
-    "install-browser": "npx playwright install chromium"
+    "install-browser": "npx playwright install chromium",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "keywords": [
     "fishweather",
@@ -40,11 +42,15 @@
   "license": "MIT",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.1",
-    "playwright": "^1.52.0"
+    "playwright": "^1.52.0",
+    "reflect-metadata": "^0.2.2",
+    "tsyringe": "^4.10.0"
   },
   "devDependencies": {
     "@types/node": "^25.5.2",
+    "moq.ts": "^10.0.8",
     "tsx": "^4.21.0",
-    "typescript": "^6.0.2"
+    "typescript": "^6.0.2",
+    "vitest": "^4.1.3"
   }
 }
