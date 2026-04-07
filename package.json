@@ -1,6 +1,6 @@
 {
   "name": "@volare-consulting/fishweather-forecast",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "7-day fishing forecast combining FishWeather wind/wave/weather data, NOAA tide predictions, and moon phases. Available as a CLI, Node.js library, and MCP server for Claude Code.",
   "main": "dist/services/forecastService.js",
   "types": "dist/services/forecastService.d.ts",
@@ -39,8 +39,7 @@
     "type": "git",
     "url": "https://github.com/volare-consulting-software/fishweather.git"
   },
-  "type": "module",
-  "license": "MIT",
+    "license": "MIT",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.1",
     "playwright": "^1.52.0",

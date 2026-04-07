@@ -2,8 +2,8 @@
   "mcpServers": {
     "fishweather": {
       "type": "stdio",
-      "command": "node",
-      "args": ["src/forecast.js", "--mcp"]
+      "command": "npx",
+      "args": ["-y", "@volare-consulting/fishweather-forecast", "--mcp"]
     }
   }
 }
