@@ -1,6 +1,6 @@
 {
   "name": "@volare-consulting/fishweather-forecast",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "7-day wind and wave forecast scraper from FishWeather. Available as a CLI, Node.js library, and MCP server for Claude Code.",
   "main": "src/lib.js",
   "bin": {
