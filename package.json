@@ -1,7 +1,7 @@
 {
   "name": "@volare-consulting/fishweather-forecast",
-  "version": "1.0.1",
-  "description": "7-day wind and wave forecast scraper from FishWeather. Available as a CLI, Node.js library, and MCP server for Claude Code.",
+  "version": "1.0.2",
+  "description": "7-day fishing forecast combining FishWeather wind/wave/weather data, NOAA tide predictions, and moon phases. Available as a CLI, Node.js library, and MCP server for Claude Code.",
   "main": "src/lib.js",
   "bin": {
     "fishweather": "src/forecast.js"
@@ -23,6 +23,9 @@
     "forecast",
     "marine",
     "fishing",
+    "tides",
+    "noaa",
+    "moon-phase",
     "mcp",
     "claude",
     "model-context-protocol"

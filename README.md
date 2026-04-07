@@ -1,19 +1,26 @@
-# FishWeather Forecast Scraper
+# FishWeather Forecast & Tides
 
-A Node.js tool that scrapes 7-day wind, wave, and weather forecasts from [FishWeather](https://fishweather.com) and enriches them with moon phase data. Provide a location (city, state, or landmark) and it will find the nearest free weather station and pull the forecast. Available as a CLI, Node.js library, and MCP server for Claude Code.
+A Node.js tool for fishing forecasts. Combines 7-day wind, wave, and weather data from [FishWeather](https://fishweather.com) with NOAA tide predictions and moon phase calculations. Provide a location and it finds the nearest stations automatically. Available as a CLI, Node.js library, and MCP server for Claude Code.
 
 ## Data Captured
 
-For each day (AM and PM):
+**Weather forecast** (per day, AM and PM):
 
-- **Peak Wind Speed** (mph)
-- **Gust Speed** (mph)
-- **Wind Direction** (compass bearing and degrees, indicating where the wind is blowing **from**)
+- **Peak Wind Speed** (mph) and **Gust Speed** (mph)
+- **Wind Direction** (compass bearing and degrees, where the wind is blowing **from**)
 - **Wave Height** (ft)
 - **Air Temperature** (°F)
-- **Cloud Cover** (%)
-- **Rain Chance** (%)
-- **Moon Phase** (phase name and illumination %, calculated astronomically per day)
+- **Cloud Cover** (%) and **Rain Chance** (%)
+
+**Tides** (per day, from NOAA):
+
+- **High/Low tide times** and **heights** (ft, MLLW datum)
+- Sourced from the nearest NOAA tide prediction station
+
+**Moon phase** (per day):
+
+- **Phase name**: New Moon, Waxing Crescent, First Quarter, Waxing Gibbous, Full Moon, Waning Gibbous, Last Quarter, Waning Crescent
+- **Illumination %**: 0% (new) to 100% (full)
 
 ## Install from npm
 
@@ -49,11 +56,17 @@ node src/forecast.js <location> [options]
 ### Examples
 
 ```bash
-# Table output
+# Full fishing forecast (weather + tides + moon)
 node src/forecast.js "southport, nc"
+
+# Tides only (no weather scraping — fast)
+node src/forecast.js "southport, nc" --tides
 
 # JSON output (useful for piping to other tools)
 node src/forecast.js "key west, fl" --json
+
+# Tides as JSON
+node src/forecast.js "key west, fl" --tides --json
 
 # Show the browser window while scraping (for debugging)
 node src/forecast.js "outer banks" --visible
@@ -61,58 +74,96 @@ node src/forecast.js "outer banks" --visible
 
 ### Options
 
-| Flag        | Description                              |
-|-------------|------------------------------------------|
-| `--json`    | Output as JSON instead of a formatted table |
-| `--visible` | Show the browser window during scraping  |
-| `--mcp`     | Start as an MCP server (for Claude Code) |
+| Flag        | Description                                       |
+|-------------|---------------------------------------------------|
+| `--tides`   | Show only NOAA tide predictions (no weather)      |
+| `--json`    | Output as JSON instead of formatted text           |
+| `--visible` | Show the browser window during scraping            |
+| `--mcp`     | Start as an MCP server (for Claude Code)           |
 
-### Sample Output
+### Sample Output — Full Forecast
 
 ```
 Searching for stations near "southport, nc"...
 Found station: Cape Fear Pilot (ID: 54114)
 
 Cape Fear Pilot - 7 Day Forecast
-Fetched: 4/7/2026, 10:53:50 AM
+Tides: Southport (NOAA 8659084)
+Fetched: 4/7/2026, 11:11:08 AM
 
-| Day          | Period | Wind (mph) | Gust (mph) | Wind Dir       | Wave Ht (ft) | Temp (°F) | Cloud (%) | Rain (%) | Moon               |
-|--------------|--------|------------|------------|----------------|--------------|-----------|-----------|----------|--------------------|
-| Tue          | AM     |         12 |         14 | SW (220°)      |          2.5 |        59 |       100 |        0 | Waning Gibbous 72% |
-|              | PM     |         25 |         31 | SW (228°)      |          4.6 |        65 |       100 |        0 |                    |
-| Wed          | AM     |         27 |         36 | SSW (211°)     |          5.7 |        51 |        67 |        0 | Waning Gibbous 62% |
-|              | PM     |         25 |         28 | SW (220°)      |          5.9 |        57 |        67 |        0 |                    |
-| Thu          | AM     |         22 |         28 | SSW (201°)     |          5.3 |        49 |        53 |        0 | Waning Gibbous 52% |
-|              | PM     |         20 |         23 | SSW (207°)     |          4.9 |        63 |        43 |        0 |                    |
-| Fri          | AM     |         16 |         19 | SSW (204°)     |          4.3 |        55 |        15 |        0 | Last Quarter 41%   |
-|              | PM     |         11 |         12 | SW (214°)      |          3.3 |        64 |        11 |        0 |                    |
-| Sat          | AM     |          5 |          7 | ESE (117°)     |          2.8 |        55 |        74 |        0 | Waning Crescent 31% |
-|              | PM     |          7 |         13 | NNE (24°)      |          2.5 |        75 |        10 |        0 |                    |
-| Sun          | AM     |          8 |          9 | WNW (298°)     |          2.1 |        61 |       100 |        0 | Waning Crescent 22% |
-|              | PM     |          7 |         17 | NNW (332°)     |          2.3 |        73 |        95 |        0 |                    |
-| Mon          | AM     |          7 |         16 | NNW (334°)     |          2.3 |        63 |        99 |        0 | Waning Crescent 13% |
-|              | PM     |         11 |         23 | NNE (22°)      |          2.2 |        73 |       100 |        0 |                    |
+--- Tue 2026-04-07 | Waning Gibbous 72% ---
+    Tides: H4.5ft@00:00 L0.7ft@06:22 H3.5ft@12:18 L0.6ft@18:15
+  AM  Wind 12 mph (g14) SW (220°)       Waves 2.5ft  59°F  Cloud 100%  Rain 0%
+  PM  Wind 25 mph (g31) SW (228°)       Waves 4.6ft  65°F  Cloud 100%  Rain 0%
+--- Wed 2026-04-08 | Waning Gibbous 62% ---
+    Tides: H4.3ft@00:49 L0.8ft@07:11 H3.4ft@13:09 L0.7ft@19:05
+  AM  Wind 27 mph (g36) SSW (211°)      Waves 5.7ft  51°F  Cloud  67%  Rain 0%
+  PM  Wind 25 mph (g28) SW (220°)       Waves 5.9ft  57°F  Cloud  67%  Rain 0%
+--- Fri 2026-04-10 | Last Quarter 41% ---
+    Tides: H4.2ft@02:40 L0.9ft@09:09 H3.4ft@15:09 L0.8ft@21:10
+  AM  Wind 16 mph (g19) SSW (204°)      Waves 4.3ft  55°F  Cloud  15%  Rain 0%
+  PM  Wind 11 mph (g12) SW (214°)       Waves 3.3ft  64°F  Cloud  11%  Rain 0%
+```
+
+### Sample Output — Tides Only
+
+```
+Fetching tides near "southport, nc"...
+
+Tide Predictions — Southport (NOAA 8659084)
+Fetched: 4/7/2026, 11:13:34 AM
+
+2026-04-07
+  High 4.5 ft  @ 00:00
+  Low  0.7 ft  @ 06:22
+  High 3.5 ft  @ 12:18
+  Low  0.6 ft  @ 18:15
+2026-04-08
+  High 4.3 ft  @ 00:49
+  Low  0.8 ft  @ 07:11
+  High 3.4 ft  @ 13:09
+  Low  0.7 ft  @ 19:05
 ```
 
 ## How It Works
+
+### Weather Forecast
 
 1. Searches `fishweather.com/windlist/<location>` for nearby weather stations
 2. Selects the first free station (skips PRO/PLUS stations that require a paid subscription)
 3. Navigates to that station's spot page and switches to the 7 Day forecast view
 4. Extracts wind speed, gust, direction, wave height, temperature, cloud cover, and rain chance for each AM/PM period
 5. Reverses the raw wind direction by 180° so it represents where the wind is blowing **from**
-6. Calculates moon phase and illumination for each day using an astronomical algorithm (no external API needed)
+
+### Tides
+
+1. Geocodes the location to lat/lng using the ArcGIS geocoder (free, no key)
+2. Finds the nearest NOAA tide prediction station from the full station list (3,400+ stations)
+3. Fetches high/low tide predictions from the NOAA CO-OPS API (free, no key)
+
+### Moon Phase
+
+Calculates moon phase and illumination for each day using an astronomical algorithm based on the synodic month. No external API needed.
 
 ### Moon Phase for Fishing
 
-Moon phase is included because it affects fish behavior. Around a **Full Moon**, fish tend to feed more actively at night due to increased visibility. The day after a full moon, you can often wait to head out until later in the morning since the fish were up feeding late. The moon data includes:
+Moon phase is included because it affects fish behavior. Around a **Full Moon**, fish tend to feed more actively at night due to increased visibility. The day after a full moon, you can often wait to head out until later in the morning since the fish were up feeding late.
 
-- **Phase name**: New Moon, Waxing Crescent, First Quarter, Waxing Gibbous, Full Moon, Waning Gibbous, Last Quarter, Waning Crescent
-- **Illumination %**: 0% (new) to 100% (full)
+## Architecture
+
+```
+src/
+  fishweather.js  — FishWeather scraping (Playwright browser, station search, forecast)
+  noaa.js         — NOAA tides (geocode location, find nearest station, fetch predictions)
+  moon.js         — Moon phase calculator (pure math, no dependencies)
+  lib.js          — Orchestrator (combines weather + tides + moon into one result)
+  forecast.js     — CLI entry point (also serves as MCP entry via --mcp flag)
+  mcp-server.js   — MCP server definition
+```
 
 ## MCP Server (Claude Code Integration)
 
-This package also runs as an [MCP](https://modelcontextprotocol.io/) server, exposing a `get_forecast` tool that Claude Code can call directly.
+This package runs as an [MCP](https://modelcontextprotocol.io/) server, exposing tools that Claude Code can call directly.
 
 ### Register with Claude Code
 
@@ -124,7 +175,7 @@ claude mcp add --transport stdio fishweather -- npx @volare-consulting/fishweath
 
 **Via local source (this repo):**
 
-The project root `.mcp.json` is already configured. After setup, restart Claude Code and the `get_forecast` tool will be available automatically.
+The project root `.mcp.json` is already configured. After setup, restart Claude Code and the tools will be available automatically.
 
 **Manual `.mcp.json`:**
 
@@ -144,7 +195,8 @@ The project root `.mcp.json` is already configured. After setup, restart Claude 
 
 | Tool             | Description                                                  |
 |------------------|--------------------------------------------------------------|
-| `get_forecast`   | Get the 7-day wind, wave, weather, and moon phase forecast for a location. Takes a `location` string parameter. |
+| `get_forecast`   | Full 7-day fishing forecast: wind, waves, weather, tides, and moon phase. Takes a `location` parameter. |
+| `get_tides`      | NOAA high/low tide predictions only. Takes a `location` parameter and optional `days` (default 7). Fast — no browser needed. |
 
 ### Example Prompts in Claude Code
 
@@ -152,9 +204,12 @@ The project root `.mcp.json` is already configured. After setup, restart Claude 
 
 > "Should I go fishing in Southport this Saturday?"
 
-Claude will call `get_forecast` and use the wind, wave, weather, and moon data to give you a complete answer.
+> "When is high tide in Wrightsville Beach tomorrow?"
+
+Claude will call the appropriate tool and use the data to give you a complete answer.
 
 ## Troubleshooting
 
-- **Forecast table did not load** - The site may be blocking headless browsers. Try running with `--visible` to see what's happening. A `debug-screenshot.png` is saved automatically on failure.
-- **No free stations found** - All nearby stations may require a Pro/Plus subscription. Try a different or broader location search.
+- **Forecast table did not load** — The site may be blocking headless browsers. Try running with `--visible` to see what's happening. A `debug-screenshot.png` is saved automatically on failure.
+- **No free stations found** — All nearby stations may require a Pro/Plus subscription. Try a different or broader location search.
+- **Tide data missing** — If NOAA tide data fails to load, the full forecast still works — tides will be omitted with a warning. Use `--tides` separately to debug.
