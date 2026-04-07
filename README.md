@@ -157,15 +157,28 @@ Moon phase is included because it affects fish behavior. Around a **Full Moon**,
 
 ## Architecture
 
+Uses [tsyringe](https://github.com/microsoft/tsyringe) for dependency injection with interface-based services.
+
 ```
 src/
-  types/            — TypeScript type definitions (one file per type)
-  fishweather.ts    — FishWeather scraping (Playwright browser, station search, forecast)
-  noaa.ts           — NOAA tides (geocode location, find nearest station, fetch predictions)
-  moon.ts           — Moon phase calculator (pure math, no dependencies)
-  lib.ts            — Orchestrator (combines weather + tides + moon into one result)
-  forecast.ts       — CLI entry point (also serves as MCP entry via --mcp flag)
-  mcp-server.ts     — MCP server definition
+  types/              — TypeScript types and enums (one file per type)
+  interfaces/         — Service interfaces and DI tokens
+  services/
+    forecastService   — Orchestrator (combines weather + tides + moon)
+    weatherScraper    — FishWeather scraping (Playwright browser, station search)
+    tideProvider      — NOAA tides (geocode, find station, fetch predictions)
+    moonPhaseProvider — Moon phase calculator (pure math)
+    geocoder          — ArcGIS geocoding
+    httpClient        — HTTPS client
+    logger            — Console logger
+  formatters/         — Output formatting (shared by CLI and MCP)
+  config.ts           — Centralized configuration (API URLs, timeouts)
+  container.ts        — DI container registration
+  main.ts             — CLI entry point
+  mcpServer.ts        — MCP server entry point
+test/
+  testContainer.ts    — Shared test helper for DI mock registration
+  *.test.ts           — Unit tests (vitest + moq.ts)
 ```
 
 ## MCP Server (Claude Code Integration)
