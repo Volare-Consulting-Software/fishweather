@@ -14,8 +14,8 @@ server.tool(
   "get_forecast",
   "Get the 7-day wind and wave forecast from FishWeather for a given location. " +
     "Searches for the nearest free weather station and returns peak wind speed, " +
-    "gust, wind direction (where wind is blowing from), and wave height for " +
-    "each morning (AM) and afternoon (PM).",
+    "gust, wind direction (where wind is blowing from), wave height, air temperature, " +
+    "cloud cover, rain chance, and moon phase for each morning (AM) and afternoon (PM).",
   {
     location: z
       .string()
@@ -30,17 +30,22 @@ server.tool(
       let text = `${result.station} - 7 Day Forecast\n`;
       text += `Fetched: ${new Date().toLocaleString()}\n\n`;
       text +=
-        "| Day          | Period | Wind (mph) | Gust (mph) | Wind Dir       | Wave Ht (ft) |\n";
+        "| Day          | Period | Wind (mph) | Gust (mph) | Wind Dir       | Wave Ht (ft) | Temp (°F) | Cloud (%) | Rain (%) | Moon               |\n";
       text +=
-        "|--------------|--------|------------|------------|----------------|--------------||\n";
+        "|--------------|--------|------------|------------|----------------|--------------|-----------|-----------|----------|--------------------||\n";
 
       let prevDay = "";
       for (const row of result.forecast) {
-        const dayLabel =
-          row.day !== prevDay ? row.day.padEnd(12) : "".padEnd(12);
+        const isNewDay = row.day !== prevDay;
+        const dayLabel = isNewDay
+          ? row.day.padEnd(12)
+          : "".padEnd(12);
         prevDay = row.day;
         const dir = `${row.windDirCompass} (${row.windDirDeg}°)`;
-        text += `| ${dayLabel} | ${row.period.padEnd(6)} | ${String(row.windSpeed).padStart(10)} | ${String(row.gust).padStart(10)} | ${dir.padEnd(14)} | ${String(row.waveHeight).padStart(12)} |\n`;
+        const moon = isNewDay
+          ? `${row.moonPhase} ${row.moonIllumination}%`
+          : "";
+        text += `| ${dayLabel} | ${row.period.padEnd(6)} | ${String(row.windSpeed).padStart(10)} | ${String(row.gust).padStart(10)} | ${dir.padEnd(14)} | ${String(row.waveHeight).padStart(12)} | ${String(row.tempF).padStart(9)} | ${String(row.cloudPct).padStart(9)} | ${String(row.precipPct).padStart(8)} | ${moon.padEnd(18)} |\n`;
       }
 
       return {
