@@ -13,7 +13,8 @@ import { TideResult } from "../src/types/tide";
 import { TideType } from "../src/types/tideType";
 import { registerMocks, container } from "./testContainer";
 
-const TEST_DATE = "2024-01-01";
+const TEST_DATE = "2024-01-02";
+const PREV_NIGHT_DATE = "2024-01-01";
 const TEST_STATION_NAME = "Test Station";
 const TEST_STATION_ID = "test-123";
 const TIDE_STATION_NAME = "Springmaid Pier";
@@ -88,7 +89,7 @@ describe("ForecastService", () => {
     moonProviderMock
       .setup((instance) => instance.getPhasesForDays(It.IsAny(), It.IsAny()))
       .returns({
-        [TEST_DATE]: {
+        [PREV_NIGHT_DATE]: {
           phase: MOCK_MOON_PHASE,
           illumination: MOCK_MOON_ILLUMINATION,
           age: MOCK_MOON_AGE,
@@ -158,6 +159,55 @@ describe("ForecastService", () => {
       (instance) => instance.warn(It.IsAny()),
       Times.Once()
     );
+  });
+
+  it("getForecast_moonPhase_usesPreviousNightNotForecastDate", async () => {
+    moonProviderMock = new Mock<IMoonPhaseProvider>();
+    moonProviderMock
+      .setup((instance) => instance.getPhase(It.IsAny()))
+      .returns({ phase: MoonPhase.NewMoon, illumination: 0, age: 0 });
+    moonProviderMock
+      .setup((instance) => instance.getPhasesForDays(It.IsAny(), It.IsAny()))
+      .returns({
+        [TEST_DATE]: {
+          phase: MoonPhase.NewMoon,
+          illumination: 0,
+          age: 0,
+        },
+        [PREV_NIGHT_DATE]: {
+          phase: MoonPhase.FullMoon,
+          illumination: 99,
+          age: 14.8,
+        },
+      });
+
+    registerAllMocks();
+
+    const result = await service.getForecast("southport, nc");
+    expect(result.forecast[0]!.moonPhase).toBe(MoonPhase.FullMoon);
+    expect(result.forecast[0]!.moonIllumination).toBe(99);
+  });
+
+  it("getForecast_noMoonDataForPreviousNight_fallsBackToDefaults", async () => {
+    moonProviderMock = new Mock<IMoonPhaseProvider>();
+    moonProviderMock
+      .setup((instance) => instance.getPhase(It.IsAny()))
+      .returns({ phase: MoonPhase.NewMoon, illumination: 0, age: 0 });
+    moonProviderMock
+      .setup((instance) => instance.getPhasesForDays(It.IsAny(), It.IsAny()))
+      .returns({
+        [TEST_DATE]: {
+          phase: MoonPhase.FullMoon,
+          illumination: 99,
+          age: 14.8,
+        },
+      });
+
+    registerAllMocks();
+
+    const result = await service.getForecast("southport, nc");
+    expect(result.forecast[0]!.moonPhase).toBe("");
+    expect(result.forecast[0]!.moonIllumination).toBe(0);
   });
 
   it("getForecast_noTidesForForecastDate_setsEmptyTidesArray", async () => {

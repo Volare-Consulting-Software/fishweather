@@ -26,7 +26,9 @@ export class ForecastService {
 
     const today = new Date();
     today.setHours(12, 0, 0, 0);
-    const moonPhases = this.moonProvider.getPhasesForDays(today, 14);
+    const startDate = new Date(today);
+    startDate.setDate(startDate.getDate() - 1);
+    const moonPhases = this.moonProvider.getPhasesForDays(startDate, 15);
 
     let tideData = null;
     try {
@@ -37,7 +39,10 @@ export class ForecastService {
     }
 
     for (const row of forecast) {
-      const moon = moonPhases[row.date] ?? { phase: "", illumination: 0 };
+      const prevDate = new Date(row.date + "T12:00:00");
+      prevDate.setDate(prevDate.getDate() - 1);
+      const prevDateStr = prevDate.toISOString().split("T")[0];
+      const moon = moonPhases[prevDateStr] ?? { phase: "", illumination: 0 };
       row.moonPhase = moon.phase;
       row.moonIllumination = moon.illumination;
 

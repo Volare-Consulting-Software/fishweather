@@ -26,7 +26,7 @@ export function formatForecastTable(result: ForecastResult): string {
     if (isNewDay) {
       const moon = `${row.moonPhase} ${row.moonIllumination}%`;
       const tideStr = formatTides(row.tides);
-      output += `\n--- ${row.day} ${row.date} | ${moon} ---\n`;
+      output += `\n--- ${row.day} ${row.date} | Last Night: ${moon} ---\n`;
       if (tideStr) output += `    Tides: ${tideStr}\n`;
     }
 
