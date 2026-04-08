@@ -5,7 +5,7 @@
   "main": "dist/services/forecastService.js",
   "types": "dist/services/forecastService.d.ts",
   "bin": {
-    "fishweather": "dist/main.js"
+    "fishweather-forecast": "dist/main.js"
   },
   "files": [
     "dist/",
@@ -39,7 +39,7 @@
     "type": "git",
     "url": "https://github.com/volare-consulting-software/fishweather.git"
   },
-    "license": "MIT",
+  "license": "MIT",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.1",
     "playwright": "^1.52.0",
